@@ -1,68 +1,80 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Hasura - Auth0 - React Boilerpalte
 
-## Available Scripts
+Boilerplate application using React, Hasura GraphQL Engine and Auth0.
 
-In the project directory, you can run:
+The application is setup with Apollo client for both queries and subscriptions (websockets). Auth0 is also configured. 
 
-### `yarn start`
+## Getting Started
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+### Prerequisites
 
-### `yarn test`
+You need to have Node.js installed in your local machine. You can follow the steps from [here](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-18-04).
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Installing
 
-### `yarn build`
+After making sure Node.js is installed, clone the repository on your local machine. 
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Go into the project directory and install all teh dependencies:
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+```
+cd Hasura-Auth0-React-Boilerplate
+npm install
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Make a new file under `src/` named `env.js`
 
-### `yarn eject`
+```
+export const vars = {
+    "GRAPHQL_ENDPOINT": 'https://<YOUR_GRAPHQL_ENDPOINT>',
+    "GRAOHQL_REALTIME_ENDPOINT": 'wss://<YOUR_GRAPHQL_ENDPOINT>',
+    "DOMAIN": "<YOUR_AUTH0_DOMAIN>"
+    "CLIENT_ID": "YOUR_CLIENT_ID_FOR_AUTH0",
+    "CALLBACK_URL": "YOUR_CALLBACK_URL"
+  }
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Auth0 configurations
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Make a new application on [Auth0](https://auth0.com/) and make sure you select Single Page Web Application as the application type. 
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Add appropriate callback URLs in Allowed Callback URLs and Allowed Web Origins.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Add a new *role* and populate it with the following: 
 
-## Learn More
+```
+function (user, context, callback) {
+  const namespace = "https://hasura.io/jwt/claims";
+  context.idToken[namespace] = 
+    { 
+      'x-hasura-default-role': 'user',
+      // do some custom logic to decide allowed roles
+      'x-hasura-allowed-roles': ['user'],
+      'x-hasura-user-id': user.user_id
+    };
+  callback(null, user, context);
+}
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+And you're done! Run the app using: 
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+yarn start
+```
+## Deployment
 
-### Code Splitting
+Build the app using `yarn build` and deploy it on Heroku.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+## Built With
 
-### Analyzing the Bundle Size
+* [Hasura GraohQL Engine](https://hasura.io/) - Powering the back-end
+* [React](https://reactjs.org/) - The front-end JS Library
+* [Auth0](https://auth0.com/) - Used for Authentication
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+## Contributing
 
-### Making a Progressive Web App
+All contributions are welcome! :)
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
 
-### Advanced Configuration
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
